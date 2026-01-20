@@ -1,0 +1,170 @@
+/* iOS Base Styles for Prototypes */
+
+:root {
+    --ios-blue: #007aff;
+    --ios-gray: #8e8e91;
+    --ios-light-gray: #f2f2f7;
+    --ios-dark-bg: #1c1c1e;
+}
+
+.screen {
+    background: white;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-radius: 40px;
+    overflow: hidden;
+    position: absolute;
+    width: 390px;
+    height: 844px;
+    border: 8px solid #1c1c1e;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.screen.dark {
+    background: var(--ios-dark-bg);
+    color: white;
+}
+
+.status-bar {
+    height: 44px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 24px;
+    align-items: center;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.home-indicator {
+    width: 134px;
+    height: 5px;
+    background: black;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.screen.dark .home-indicator {
+    background: white;
+}
+
+.btn-ios {
+    background: var(--ios-blue);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.list-group {
+    background: white;
+    border-radius: 10px;
+    margin: 16px;
+    overflow: hidden;
+}
+
+.list-item {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid #c6c6c8;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.screen-title {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1c1c1e;
+    white-space: nowrap;
+}
+
+/* Canvas & Flow Elements */
+.screen-wrapper {
+    position: absolute;
+    z-index: 10;
+}
+
+.flow-line {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.flow-label {
+    position: absolute;
+    background: var(--ios-blue);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+/* Canvas Controls (v1 Style) */
+#controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+#controls button {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #1c1c1e;
+    font-size: 13px;
+}
+
+#controls button:hover {
+    background: #f9f9f9;
+}
+
+.control-hint {
+    align-self: center;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Typography Utilities */
+.ios-large-title {
+    font-size: 34px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.ios-subtitle {
+    color: var(--ios-gray);
+    font-size: 17px;
+    margin-bottom: 60px;
+}
+
+.text-blue {
+    color: var(--ios-blue);
+}

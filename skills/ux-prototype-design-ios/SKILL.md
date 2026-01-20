@@ -15,28 +15,52 @@ This skill enables you to generate high-fidelity iOS-style HTML prototypes. The 
 - **Fonts**: Use system fonts (San Francisco simulation via `-apple-system`).
 - **Components**: Use iOS standard components (Tab Bars, Navigation Bars, Large Titles, Rounded corners 12px-20px).
 - **Aesthetic**: Clean, white/light-gray backgrounds (or systematic Dark Mode), vibrant accent colors, blurred backdrops (`backdrop-filter: blur()`).
+- **Images**: You MAY use the `generate_image` tool to create assets if needed (e.g., hero images, avatars).
 - If the user asks for a flow, plan for multiple screens connected visually.
 
-### 2. Generating the Prototype
-- **Primary Method**: Single HTML file generation.
+### 2. Storyboard Verification (CRITICAL)
+- **Do NOT generate the prototype immediately.**
+- First, present a text-based "Storyboard Plan" describing the screens and the flow.
+- Ask the user: "Shall I proceed with this plan?"
+- **Wait for user confirmation** before generating any HTML code.
+
+### 3. Generating the Prototype
+- **Efficiency**: To minimize output size, follow these rules:
+    - **External Styles**: ALWAYS use `ios-base.css` for common iOS styles (Status Bar, Buttons, Cards, Home Indicator).
+    - **JS Helpers**: Use the built-in `injectCommonUI()` in the boilerplate to automatically add Status Bars and Home Indicators to your `.screen` divs.
+    - **Batching**: For complex prototypes (10+ screens), generate the core flow first, then use `multi_replace_file_content` to add additional screens/vectors in subsequent steps.
 - **Base Code**: READ `resources/canvas-boilerplate.html` to understand the structure.
-- **Injection**:
+    - **Injection**:
     - Wrap your generated UI in a `<div class="screen" id="screen-1" style="...">`.
     - Place it inside the `#canvas-content` div of the boilerplate.
+    - **Screen Title**: You MUST add a `<div class="screen-title">Scene Name</div>` immediately before each `.screen` div to label the scenario.
     - Use absolute positioning (`top`, `left`) to place screens on the canvas.
-    - Example: `<div class="screen" style="left: 50px; top: 50px; width: 360px;">...</div>`
+    - **Spacing**: Ensure screens are spaced far apart for clarity (recommend at least **500px-800px** horizontal gap between screens).
+    - **Branching Layout (CRITICAL)**: Do NOT simply place screens in a single linear row.
+        - Analyze the flow: If a screen has multiple distinct actions leading to different outcomes, branch the layout vertically.
+        - Example: If "Home" leads to "Settings" and "Profile", place "Home" as the root, "Settings" in one row (e.g., top), and "Profile" in another row (e.g., bottom).
+        - Map the X/Y coordinates to the logical user journey.
+    - Example:
+      ```html
+      <div class="screen-title">Login Screen</div>
+      <div class="screen" style="left: 100px; top: 100px; width: 390px;">...</div>
+      ```
 
-### 3. Visual Flow (Connectors)
+### 4. Visual Flow (Connectors)
 - To show flow between screens, add SVG lines inside `#canvas-content` but *behind* the screens (z-index).
 - Generate a `<svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">` container.
-- Add `<path d="M x1 y1 C cp1x cp1y, cp2x cp2y, x2 y2" stroke="blue" fill="none" marker-end="url(#arrow)" />` to connect elements.
+- **Bezier Flows (MANDATORY)**: Never use straight lines. Use cubic Bezier curves in "Figma blue" (`#007AFF`) with text annotations on the curve. 
+    - **Style**: Use dashed lines (`stroke-dasharray="8,8"`) for all flow connections to distinguish them from UI elements.
+    - **Layering**: Ensure flow lines are rendered **BEHIND** the screens (lower z-index) so they never obstruct UI elements.
+- **Syntax**: `<path d="..." stroke="#007AFF" stroke-width="3" stroke-dasharray="8,8" fill="none" marker-end="url(#arrow)" />`
+- **Annotations**: You MUST add a text label on the curve explaining the action.
 - Ensure you define the `<marker id="arrow" ...>` in `<defs>`.
 
-### 4. Interactive Canvas
+### 5. Interactive Canvas
 - The boilerplate handles Pan/Zoom.
 - **IMPORTANT**: Do not reimplement pan/zoom logic. Just output the boilerplate code with your content injected.
 
-### 5. Examples
+### 6. Examples
 
 #### Example Request: "Login flow to Home"
 **Output Structure**:
@@ -66,8 +90,14 @@ This skill enables you to generate high-fidelity iOS-style HTML prototypes. The 
 </html>
 ```
 
-### 5. Explaining UX Decisions
+### 7. Explaining UX Decisions
 - Before or after generating the code, briefly explain your design choices:
     - Why you chose this layout?
     - How color handles focus?
     - Why elements are positioned this way for usability?
+
+### 8. Performance & Scalability Optimization
+- **Rule of Thumb**: Keep single tool output under 500 lines of HTML.
+- **Shared Assets**: Reference shared resources in `resources/` instead of inlining large SVG or CSS blocks.
+- **Incremental Growth**: Avoid "Big Bang" generation for large storyboards. Build, Verify, Extend.
+- **Canvas Layout**: Use generous white space between screens (600px+ horizontally) to accommodate long flow labels and curved paths without overlap.

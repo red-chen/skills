@@ -1,122 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UX Prototype Canvas</title>
+    <link rel="stylesheet" href="ios-base.css">
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #f0f0f0; font-family: 'Inter', sans-serif; }
-        #canvas-container { width: 100%; height: 100%; cursor: grab; position: relative; overflow: hidden; }
-        #canvas-container:active { cursor: grabbing; }
-        #canvas-content { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
-        
-        /* UI Element Styles (Defaults for prototypes) */
-        .screen {
-            background: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-radius: 12px;
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: -apple-system, sans-serif;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            position: relative;
+            overflow: hidden;
+            background-size: 20px 20px;
+            background-image:
+                linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        #canvas-content {
+            transform-origin: 0 0;
             position: absolute;
+            left: 0;
+            top: 0;
         }
-        
-        /* Controls */
-        #controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-        button {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        button:hover { background: #f9f9f9; }
+
+        /* Controls are now in ios-base.css */
     </style>
 </head>
+
 <body>
 
-<div id="canvas-container">
-    <div id="canvas-content">
-        <!-- PROTOTYPE CONTENT GOES HERE -->
-        <!-- Example: <div class="screen" style="left: 100px; top: 100px; width: 375px; height: 812px;">...</div> -->
+    <div id="canvas-container">
+        <div id="canvas-content">
+            <!-- PROTOTYPE CONTENT GOES HERE -->
+        </div>
     </div>
-</div>
 
-<div id="controls">
-    <button onclick="resetView()">Reset View</button>
-    <span style="align-self: center; color: #666; font-size: 12px;">Pan: Drag | Zoom: Scroll</span>
-</div>
+    <div id="controls">
+        <button onclick="resetView()">Reset View</button>
+        <div class="control-hint">Pan: Drag | Zoom: Scroll</div>
+    </div>
 
-<script>
-    const container = document.getElementById('canvas-container');
-    const content = document.getElementById('canvas-content');
-    
-    let state = {
-        scale: 1,
-        panning: false,
-        pointX: 0,
-        pointY: 0,
-        startX: 0,
-        startY: 0
-    };
+    <script>
+        const container = document.getElementById('canvas-container');
+        const content = document.getElementById('canvas-content');
 
-    const setTransform = () => {
-        content.style.transform = `translate(${state.pointX}px, ${state.pointY}px) scale(${state.scale})`;
-    }
+        let state = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            startX: 0,
+            startY: 0
+        };
 
-    container.onmousedown = function (e) {
-        e.preventDefault();
-        state.startX = e.clientX - state.pointX;
-        state.startY = e.clientY - state.pointY;
-        state.panning = true;
-    }
+        const setTransform = () => {
+            content.style.transform = `translate(${state.pointX}px, ${state.pointY}px) scale(${state.scale})`;
+        }
 
-    container.onmouseup = function (e) {
-        state.panning = false;
-    }
+        container.onmousedown = function (e) {
+            if (e.target.closest('#controls')) return;
+            e.preventDefault();
+            state.startX = e.clientX - state.pointX;
+            state.startY = e.clientY - state.pointY;
+            state.panning = true;
+        }
 
-    container.onmousemove = function (e) {
-        e.preventDefault();
-        if (!state.panning) return;
-        state.pointX = (e.clientX - state.startX);
-        state.pointY = (e.clientY - state.startY);
-        setTransform();
-    }
+        container.onmouseup = function (e) {
+            state.panning = false;
+        }
 
-    container.onwheel = function (e) {
-        e.preventDefault();
-        const xs = (e.clientX - state.pointX) / state.scale;
-        const ys = (e.clientY - state.pointY) / state.scale;
-        const delta = -e.deltaY;
-        
-        (delta > 0) ? (state.scale *= 1.2) : (state.scale /= 1.2);
-        
-        state.pointX = e.clientX - xs * state.scale;
-        state.pointY = e.clientY - ys * state.scale;
+        container.onmousemove = function (e) {
+            if (!state.panning) return;
+            e.preventDefault();
+            state.pointX = (e.clientX - state.startX);
+            state.pointY = (e.clientY - state.startY);
+            setTransform();
+        }
 
-        setTransform();
-    }
-    
-    function resetView() {
-        state.scale = 1;
-        state.pointX = 100;
-        state.pointY = 100;
-        setTransform();
-    }
-    
-    // Initial center
-    resetView();
-</script>
+        container.onwheel = function (e) {
+            e.preventDefault();
+            const xs = (e.clientX - state.pointX) / state.scale;
+            const ys = (e.clientY - state.pointY) / state.scale;
+            const delta = -e.deltaY;
 
+            (delta > 0) ? (state.scale *= 1.1) : (state.scale /= 1.1);
+            state.scale = Math.min(Math.max(0.05, state.scale), 10);
+
+            state.pointX = e.clientX - xs * state.scale;
+            state.pointY = e.clientY - ys * state.scale;
+
+            setTransform();
+        }
+
+        function drawBezierFlow(svg, startX, startY, endX, endY) {
+            const cp1x = startX + (endX - startX) * 0.5;
+            const cp2x = endX - (endX - startX) * 0.5;
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const d = `M ${startX} ${startY} C ${cp1x} ${startY}, ${cp2x} ${endY}, ${endX} ${endY}`;
+            path.setAttribute("d", d);
+            path.setAttribute("stroke", "#007AFF");
+            path.setAttribute("stroke-width", "3");
+            path.setAttribute("stroke-dasharray", "8,8");
+            path.setAttribute("fill", "none");
+            path.setAttribute("marker-end", "url(#arrowhead)");
+            svg.appendChild(path);
+        }
+
+        function resetView() {
+            state.scale = 0.5;
+            state.pointX = 100;
+            state.pointY = 200;
+            setTransform();
+        }
+
+        // UI Helpers to reduce HTML size
+        function injectCommonUI() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                if (!screen.querySelector('.status-bar')) {
+                    const sb = document.createElement('div');
+                    sb.className = 'status-bar';
+                    sb.innerHTML = '<span>9:41</span><span></span>';
+                    screen.prepend(sb);
+                }
+                if (!screen.querySelector('.home-indicator')) {
+                    const hi = document.createElement('div');
+                    hi.className = 'home-indicator';
+                    screen.append(hi);
+                }
+            });
+        }
+
+        resetView();
+        injectCommonUI();
+    </script>
 </body>
+
 </html>
